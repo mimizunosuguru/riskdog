@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>地図表示</title>
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    
+    <style>
+        html { height: 100% }
+        body { height: 100% }
+        #map { height: 100%; width: 100%}
+    </style>
+    </head>
+
+<body>
+<div id='map'></div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWl6dW5vc3VndSIsImEiOiJjbG1xN3g1ZmMwMTAzMnFxeHJmZWNqYmU1In0.zAxeFPQ43oanS-X54bZ4wQ';
+
+    // var map = new mapboxgl.Map({
+    //     container: 'map',
+    //     style: 'mapbox://styles/mapbox/streets-v11',
+    //     center: [139.7670516, 35.6811673],
+    //     zoom: 15
+    // });
+
+    // mapboxgl.Map を利用して、マップオブジェクトを設定
+    // ID タグ名の map、初期表示背景地図、中心位置の緯度経度、初期ズームレベル、地図の初期ピッチ（傾斜）を設定
+    const map = new mapboxgl.Map({
+    container: 'map', 
+    style: 'mapbox://styles/mapbox/light-v10',
+    center: [139.657125, 35.661236],
+    zoom: 10,
+    pitch: 40
+    });
+
+    // 地図のコントロールを追加
+    map.addControl(new mapboxgl.NavigationControl());
+
+    let scale = new mapboxgl.ScaleControl({
+    maxWidth: 250,
+    unit: 'metric'
+    });
+
+    map.addControl(scale);
+
+    // mapboxgl.Popup を利用してポップアップのオブジェクトを設定
+    let popup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+    });
+
+
+    // マウスポインタがメッシュの領域に入ったら属性情報をポップアップで表示
+    map.on("mousemove", "2DmeshLayer", function(e) {
+
+    map.getCanvas().style.cursor = 'pointer';
+
+    popup.setLngLat(e.lngLat)
+        .setHTML(
+        "<div><b>市区町村コード &nbsp;</b>" + e.features[0].properties.SHICODE + "</div>" + 
+        "<div><b>将来推計人口 2050年 (男女計)</b></div>" + 
+        "<div>" + Math.round(e.features[0].properties.PT0_2050) + " 人</div>")
+        .addTo(map);
+
+    });
+
+    // マウスポインタがメッシュの領域から離れたらポップアップをクリア
+    map.on("mouseleave", "2DmeshLayer", function() {
+    map.getCanvas().style.cursor = '';
+    popup.remove();
+    });
+
+
+
+    // 2050年の人口から10段階のカテゴリ別に分類するためのフィルタ
+    let PT0_2050_1 = ["<", ["get", "PT0_2050"], 4000];
+    let PT0_2050_2 = ["all", [">=", ["get", "PT0_2050"], 4000], ["<", ["get", "PT0_2050"], 8000]];
+    let PT0_2050_3 = ["all", [">=", ["get", "PT0_2050"], 8000], ["<", ["get", "PT0_2050"], 12000]];
+    let PT0_2050_4 = ["all", [">=", ["get", "PT0_2050"], 12000], ["<", ["get", "PT0_2050"], 16000]];
+    let PT0_2050_5 = ["all", [">=", ["get", "PT0_2050"], 16000], ["<", ["get", "PT0_2050"], 20000]];
+    let PT0_2050_6 = ["all", [">=", ["get", "PT0_2050"], 20000], ["<", ["get", "PT0_2050"], 24000]];
+    let PT0_2050_7 = ["all", [">=", ["get", "PT0_2050"], 24000], ["<", ["get", "PT0_2050"], 28000]];
+    let PT0_2050_8 = ["all", [">=", ["get", "PT0_2050"], 28000], ["<", ["get", "PT0_2050"], 32000]];
+    let PT0_2050_9 = ["all", [">=", ["get", "PT0_2050"], 32000], ["<", ["get", "PT0_2050"], 36000]];
+    let PT0_2050_10 = ["all", [">=", ["get", "PT0_2050"], 36000], ["<", ["get", "PT0_2050"], 40000]];
+
+    // 色の設定
+    let colors = ['rgb(215, 25, 28)',   'rgb(232, 91, 58)', 
+                'rgb(249, 158, 89)',  'rgb(254, 201, 128)',
+                'rgb(255, 237, 170)', 'rgb(237, 247, 201)',
+                'rgb(199, 230, 219)', 'rgb(157, 207, 228)',
+                'rgb(100, 165, 205)', 'rgb(44, 123, 182)'] 
+
+
+    const meshToMap = (meshdata) => {
+    
+    // map.addSource に 読み込んだ GeoJSON を設定 
+    map.addSource('meshdata',{
+        type: 'geojson',
+        data: meshdata,
+    });
+    
+    // map.addLayer で メッシュの色や幅、塗り潰し等の見た目を設定して、メッシュを表示
+    // メッシュの色分け表示は、case オプションにより人口の属性値で分けて表示するように設定
+    map.addLayer({
+        'id': '2DmeshLayer',
+        'type': 'fill',
+        'source': 'meshdata',
+        'layout': {},
+        'paint': {
+            "fill-color": 
+            ["case",
+                PT0_2050_1, colors[0],
+                PT0_2050_2, colors[1],
+                PT0_2050_3, colors[2],
+                PT0_2050_4, colors[3], 
+                PT0_2050_5, colors[4], 
+                PT0_2050_6, colors[5], 
+                PT0_2050_7, colors[6], 
+                PT0_2050_8, colors[7], 
+                PT0_2050_9, colors[8], 
+                PT0_2050_10, colors[9], 
+                colors[9]
+            ],
+            "fill-outline-color": "white"
+        }
+    });
+    };
+
+        // 以前のd3.queue().defer().await()の代わりにPromiseを使用
+    fetch('https://raw.githubusercontent.com/valuecreation/mapbox-prj/b014b62e2c4db92726ca35ca8ec9a52b2acd5f28/data/1km_mesh_2018_13.geojson')
+    .then(response => response.json())
+    .then(meshdata => {
+        meshToMap(meshdata);
+    })
+    .catch(err => {
+        console.error("データの取得に失敗しました:", err);
+    });
+
+    // //  1km メッシュ GeoJSON
+    // let meshGeoJsonURL = 'https://raw.githubusercontent.com/valuecreation/mapbox-prj/b014b62e2c4db92726ca35ca8ec9a52b2acd5f28/data/1km_mesh_2018_13.geojson';
+
+    // const handleGetData = (err, meshdata) => {
+    // meshToMap(meshdata);
+    // }
+
+    // d3.queue()
+    // .defer(d3.json, meshGeoJsonURL)
+    // .await(handleGetData);
+</script>
+ 
+</body>
+</html>
