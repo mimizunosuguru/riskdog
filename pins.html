@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>地図表示</title>
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    
+    <style>
+        html { height: 100% }
+        body { height: 100% }
+        #map { height: 100%; width: 100%}
+    </style>
+    </head>
+
+<body>
+<div id='map'></div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWl6dW5vc3VndSIsImEiOiJjbG1xN3g1ZmMwMTAzMnFxeHJmZWNqYmU1In0.zAxeFPQ43oanS-X54bZ4wQ';
+
+    // クラスタリングするためのGeoJSONデータ
+    const geojsonData = {
+    type: 'FeatureCollection',
+    features: [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          139.6852076252307,
+          35.71758650111617
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          140.14103874318727,
+          35.59412729396614
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          140.48766032246834,
+          36.37025461781306
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          136.7935289706876,
+          35.447271810310156
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          136.9359761950492,
+          35.16828349954642
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          134.8735002260181,
+          35.33767909267617
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          142.97663889954606,
+          43.28978905904262
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          130.48112446477506,
+          32.77603885708038
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          141.15465460948036,
+          39.76026294426285
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          140.191584503714,
+          38.987491944884994
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          141.21313998961807,
+          39.18301534154466
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          139.43350381158655,
+          37.611969568658424
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          137.96651999615062,
+          36.940425304760566
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          134.31443693275372,
+          33.96809116404455
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          132.53615345224375,
+          34.76926514902857
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          139.48354618767024,
+          35.58907028634255
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          139.85090996781082,
+          35.96693842753487
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          139.39498527638602,
+          35.83143193732079
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          139.51306649143226,
+          35.985519246256345
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          133.70216094499506,
+          33.99228381364264
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          134.03654019352427,
+          34.189368133988424
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          133.99436623425083,
+          34.01725655130586
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          134.0410588320177,
+          33.94106675217553
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          132.86351839516908,
+          33.40492884816791
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          95.21247315184257,
+          60.7981357753782
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          97.27700181401906,
+          37.657901964152856
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          88.3836475769532,
+          38.15909798198987
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          93.94199397511971,
+          31.24768505174289
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          7.198286778507054,
+          27.097480659839306
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          29.446068647145665,
+          23.711147607517688
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          14.447564016603394,
+          16.67853539273615
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          20.19699079164485,
+          -12.72199201068193
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          36.69534588524195,
+          59.21965484166958
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          101.48371151191134,
+          0.15548015634597334
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          100.73155634082934,
+          18.384784268243237
+        ],
+        "type": "Point"
+      }
+    }
+    ]
+    };
+    
+    const map = new mapboxgl.Map({
+        container: 'map', 
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [120, 37.8],
+        zoom: 1.5,
+        pitch: 0
+    });
+
+    // 地図のコントロールを追加
+    map.addControl(new mapboxgl.NavigationControl());
+
+    let scale = new mapboxgl.ScaleControl({
+    maxWidth: 250,
+    unit: 'metric'
+    });
+
+    map.addControl(scale);
+
+    map.on('load', function () {
+        // カスタムアイコンを追加
+        map.loadImage('https://raw.githubusercontent.com/mimizunosuguru/riskdog/main/Img-map-marker.png', function (error, image) {
+            if (error) throw error;
+            map.addImage('custom-marker', image);
+
+        // クラスタリング用のデータソースを追加
+        map.addSource('markers', {
+            type: 'geojson',
+            data: geojsonData,
+            cluster: true,
+
+            // 数値が低いほど、クラスター表示が解除される（ピンが表示される）
+            clusterMaxZoom: 3,
+            clusterRadius: 50
+        });
+
+        // クラスタレイヤーを追加
+        map.addLayer({
+            id: 'clusters',
+            type: 'circle',
+            source: 'markers',
+            filter: ['has', 'point_count'],
+            paint: {
+
+            // マーカー（ピン）の数に応じて、クラスターの色を変えることができる。
+            'circle-color': [
+                'step',
+                ['get', 'point_count'],
+                '#1A4067',
+                100,
+                '#f1f075',
+                750,
+                '#f28cb1'
+            ],
+            'circle-radius': [
+                'step',
+                ['get', 'point_count'],
+                20,
+                100,
+                30,
+                750,
+                40
+            ]
+            }
+        });
+
+        // クラスタ内の数を表示するレイヤーを追加
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'markers',
+            filter: ['has', 'point_count'],
+            layout: {
+            'text-field': '{point_count_abbreviated}',
+            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 12,
+            },
+            paint: {
+                'text-color': '#fff'  // ここでテキストの色を赤に設定
+            }
+        });
+
+        // 個々のマーカーを表示するレイヤーを追加
+        map.addLayer({
+        id: 'unclustered-point',
+        type: 'symbol',
+        source: 'markers',
+        filter: ['!', ['has', 'point_count']],
+        layout: {
+            'icon-image': 'custom-marker',  // カスタムアイコンを使用
+            'icon-size': 0.8  // アイコンのサイズを調整
+        }
+        });
+    });
+});
+</script>
+ 
+</body>
+</html>
